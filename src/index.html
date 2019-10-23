@@ -1,0 +1,107 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <style>
+        input {
+            font-size: 16px;
+            height: 26px;
+        }
+
+        .btns input {
+            width: 42px;
+            margin: 5px 0;
+            padding: 0px;
+        }
+    </style>
+</head>
+<body style="background: #eeeeee;">
+
+<div id="mf" style="margin:120px auto 80px;"></div>
+
+<div id="btns" class="btns" style="margin:50px auto 20px; width:300px;">
+    <input type="button" value="u"/>
+    <input type="button" value="d"/>
+    <input type="button" value="l"/>
+    <input type="button" value="r"/>
+    <input type="button" value="f"/>
+    <input type="button" value="b"/>
+    <input type="button" value="u'"/>
+    <input type="button" value="d'"/>
+    <input type="button" value="l'"/>
+    <input type="button" value="r'"/>
+    <input type="button" value="f'"/>
+    <input type="button" value="b'"/>
+</div>
+
+<div class="cs" id="cs" style="width:300px; margin:0 auto;">
+    <input type="button" value="重置颜色" style="margin-top:10px;"/>
+    <input type="button" value="重置位置" style="margin-top:10px;"/>
+    <input type="button" value="随机打乱" style="margin-top:10px;"/>
+    <input type="text" style="margin-top:10px;" value="ddr'd'ffbdrrddr'ffd'ffu'bblluudrru">
+    <input type="button" style="margin-top:10px" value="批量操作"/>
+    <input type="text" style="margin-top:10px;" value="DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD">
+    <input type="button" style="margin-top:10px" value="设置颜色"/>
+    <input type="button" style="margin-top:10px" value="还原"/>
+
+</div>
+
+
+<script type="text/javascript" src="Cube.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script type="text/javascript">
+    var cube = new Cube('mf', {borderLength: 200});
+
+    var aInt = document.getElementById('btns').getElementsByTagName('input');
+    for (var i = 0; i < aInt.length; i++) {
+        aInt[i].onclick = function () {
+            cube.turn3(this.value);
+        }
+    }
+    var aInt2 = document.getElementById('cs').getElementsByTagName('input');
+    aInt2[0].onclick = function () {
+        cube.initColor();
+    };
+    aInt2[1].onclick = function () {
+        cube.initL();
+    };
+    aInt2[2].onclick = function () {
+        cube.random();
+    };
+    aInt2[4].onclick = function () {
+        var value = aInt2[3].value;
+        cube.turn3s(value);
+    };
+    aInt2[6].onclick = function () {
+        var value = aInt2[5].value;
+        cube.setColorChar(value)
+    };
+
+    cube.recovery = function () {
+        var ip = "http://124.16.124.95:3000";
+        var api = "/getCubeMove";
+
+        var URL = ip + api + "?state=" + aInt2[5].value;
+        URL = "http://localhost:3000/getCubeMove?state=DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD";
+        axios.get(ip + api, {
+            params: {
+                state: "DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD"
+            }
+        })
+            .then(function (value) {
+                console.log(value);
+            })
+            .catch(function (reason) {
+                console.log(reason);
+            });
+
+
+    };
+    aInt2[7].onclick = function () {
+        cube.recovery(aInt2[5].value)
+    };
+</script>
+
+</body>
+</html>
