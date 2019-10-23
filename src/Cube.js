@@ -102,6 +102,7 @@ function Cube(id, opts) {
 
     //给容器加旋转事件
     this.containerMouseMove();
+    this.state = "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB";
 
 }
 
@@ -706,6 +707,7 @@ Cube.prototype.getRandom = function (a, b) {
 
 //随机打乱的方法，参数为随机打乱的步数。默认30
 Cube.prototype.random = function (n) {
+    this.initColor();
     var _this = this;
     var n = n || 30;
     var i = 0;
@@ -714,24 +716,82 @@ Cube.prototype.random = function (n) {
     var coors = ['x', 'y', 'z'];
     var linshi = parseInt(1000 / n);
     this.oneTime = linshi < 50 ? 50 : linshi;
-
-    function turn_random() {
-        i++;
-        if (i > n) {
-            _this.oneTime = speed;
-        } else {
-            var coor = coors[_this.getRandom(0, 3)];
-            var num = _this.getRandom(0, order);
-            var dir = _this.getRandom(0, 2);
-            _this.turn(coor, num, dir, function () {
-                var timeout = setTimeout(function () {
-                    clearTimeout(timeout);
-                    turn_random();
-                }, 0);
-            })
+    var value =
+        function turn_random() {
+            i++;
+            if (i > n) {
+                _this.oneTime = speed;
+            } else {
+                var coor = coors[_this.getRandom(0, 3)];
+                var num = _this.getRandom(0, order);
+                var dir = _this.getRandom(0, 2);
+                this.change(this.getTurnType(coor, num, dir))
+                _this.turn(coor, num, dir, function () {
+                    var timeout = setTimeout(function () {
+                        clearTimeout(timeout);
+                        turn_random();
+                    }, 0);
+                })
+            }
         }
-    }
 
     turn_random();
+};
+
+
+Cube.prototype.getTurnType = function (coor, num, dir) {
+    switch (coor) {
+        case "y":
+            if (num == 0) {
+                return dir ? "u_" : "u";
+            } else if (num == 2) {
+                return dir ? "d" : "d_";
+            }
+            break;
+        case "x":
+            if (num == 0) {
+                return dir ? "l_" : "l";
+            } else if (num == 2) {
+                return dir ? "r" : "r";
+            }
+            break;
+        case "z":
+            if (num == 0) {
+                return dir ? "f" : "f_";
+            } else if (num == 2) {
+                return dir ? "b_" : "b";
+            }
+            break;
+    }
+};
+
+Cube.prototype.changeState = function (turnType) {
+    switch (turnType) {
+        case "u":
+            break;
+        case "u_":
+            break;
+        case "d":
+            break;
+        case "d_":
+            break;
+        case "l":
+            break;
+        case "l_":
+            break;
+        case "r":
+            break;
+        case "r_":
+            break;
+        case "f":
+            break;
+        case "f_":
+            break;
+        case "b":
+            break;
+        case "b_":
+            break;
+    }
+
 };
 
