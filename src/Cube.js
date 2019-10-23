@@ -39,7 +39,9 @@ opts:{
 
 此对象的方法： （如上建立魔方后，也是静态的魔方，想要扭动他必须调用方法）
 常用：
-turn(coor,num,dir,comebackfn);//基础的扭动方法,参数coor：扭动那个轴方向的魔方，num：扭动这个轴的第几层的魔方，dir：方向,正方向turn 反方向false，combackfn:扭动完成后的回掉函数
+turn(coor,num,dir,comebackfn);//基础的扭动方法,
+//参数coor：扭动那个轴方向的魔方，num：扭动这个轴的第几层的魔方，
+//dir：方向,正方向ture 反方向false，combackfn:扭动完成后的回掉函数
 turn3(t);//仅限于3阶魔方的扭动，t可为 u,u',b,b'……(三阶魔方的指令，'是反方向的意思);
 turn3s(ts);//仅限于3阶魔方,ts是三阶魔方指令的组合。例如 var ts='uu\'bb\'lr\'f';注意字符串中的'要转义
 initColor();//初始化魔方最开始的样子。步数同步清零
@@ -54,9 +56,8 @@ setMouseSen(n);//设置鼠标拖拽魔方的灵敏度
 setOneTime(time);//设置魔方扭动速度- 毫秒时间。
 */
 
-
 //参数  id为魔方容器的id，opts为魔方的属性设置
-//opts  > borderLength:num 魔方边长, vColor:color魔方材料颜色 , colors:[[][][][][][]]魔方各个面的颜色  order:num 魔方阶乘 , mouseSen 拖拽时鼠标灵敏度 , oneTime 转动一下时需要的时间
+//opts  > borderLength:num 魔方边长, vColor:color魔方材料颜色 , colors:[[][][][][][]]魔方各个面的颜色  order:num 魔方阶乘 , mouseSen 拖拽时鼠标灵敏度 , oneTime 转动一下时需要的时间 
 function Cube(id, opts) {
     //储存Cube信息
     this.container = document.getElementById(id);//容器
@@ -99,7 +100,7 @@ function Cube(id, opts) {
     this.initColors = this.opts.colors || [['yellow'], ['#fff'], ['blue'], ['green'], ['red'], ['orange']];
     //this.initColors=this.opts.colors||[['none'],['none'],['none'],['none'],['none'],['none']];
     this.initColor();
-
+    this.initL([-22.5,-45,22.5]);
     //给容器加旋转事件
     this.containerMouseMove();
 
@@ -171,6 +172,11 @@ Cube.prototype.initStyle = function () {
         }
 
     }
+    for (var i = 0; i < 6; i++){
+        for(var j = 0; j < 9; j++){
+            dom[j].faces[i].attr('pos') = i+','+j;
+        }
+    }
 };
 //干掉魔方上所有颜色的方法，，只剩下材料颜色
 Cube.prototype.delColor = function () {
@@ -183,6 +189,7 @@ Cube.prototype.delColor = function () {
 }
 //设定魔方颜色设定 格式[[color,color,上面的9个点],[下],[]..]
 Cube.prototype.setColor = function (colorarr) {
+    console.log(colorarr)
     var _this = this;
     this.delColor();
     this.colors = colorarr || (function () {
@@ -191,6 +198,7 @@ Cube.prototype.setColor = function (colorarr) {
             var subarr = _this.initColors[i].slice(0);
             arr.push(subarr);
         }
+        console.log(arr)
         return arr;
     })();
     //容错this.colors,如果每一个面只给一个颜色或少给颜色，按前一个颜色算;
@@ -206,6 +214,7 @@ Cube.prototype.setColor = function (colorarr) {
     }
     var b = this.order - 1;
     var filter = [{y: 0}, {y: b}, {x: 0}, {x: b}, {z: b}, {z: 0}];
+    console.log(this.colors)
     //添加颜色
     for (var i = 0; i < 6; i++) {
         var dom = this.getDomByPos(filter[i]);
@@ -215,11 +224,17 @@ Cube.prototype.setColor = function (colorarr) {
     }
 };
 
-//设定魔方颜色设定 格式DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD
+//设定魔方颜色设定 格式
+//DRLUUBFBR  右边
+//BLURRLRUB  前边
+//LRDDFDLFU  下边
+//FUFFDBRDU  左边
+//BRUFLLFDD  后边
+//BFLUBLRBD  上边
 Cube.prototype.setColorChar = function (color) {
     var colorType = ['yellow', '#fff', 'blue', 'green', 'red', 'orange'];
     var arr = [];
-
+    //对输入的字符串顺序进行了调整
     var right = color.substr(9, 9);
     var coorright = right[2] + right[5] + right[8] + right[1] + right[4] + right[7] + right[0] + right[3] + right[6];
     var temp = color.substr(0, 9) + coorright + color.substr(18, 36);
@@ -239,9 +254,10 @@ Cube.prototype.setColorChar = function (color) {
     var coorback = back[2] + back[1] + back[0] + back[5] + back[4] + back[3] + back[8] + back[7] + back[6];
     temp = color.substr(0, 45) + coorback;
     color = temp;
-
+    console.log(color)
     temp = color.substr(0, 9) + color.substr(27, 18) + color.substr(9, 18) + color.substr(45, 9);
     color = temp;
+    console.log(color)
     for (var i = 0; i < 6; i++) {
         var sub = color.substr(i * 9, 9);
         var subArr = [];
@@ -377,8 +393,10 @@ Cube.prototype.containerMouseMove = function () {
     });
 };
 //初始化魔方位子
-Cube.prototype.initL = function () {
-    this.rotateX = this.rotateY = this.rotateZ = 0;
+Cube.prototype.initL = function (rotateAngle) {
+    this.rotateX = rotateAngle[0]
+    this.rotateY = rotateAngle[1]
+    this.rotateZ = rotateAngle[2]
     this.container.style.WebkitTransform = 'perspective(800px) rotateY(' + this.rotateY + 'deg) rotateX(' + this.rotateX + 'deg) rotateZ(' + this.rotateZ + 'deg)';
 };
 //设置容器拖拽时候的鼠标灵敏度
@@ -734,4 +752,8 @@ Cube.prototype.random = function (n) {
 
     turn_random();
 };
+
+
+
+
 
