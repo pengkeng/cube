@@ -81,12 +81,12 @@
     cube.recovery = function () {
         var ip = "http://124.16.124.95:3000";
         var api = "/getCubeMove";
-
-        var URL = ip + api + "?state=" + aInt2[5].value;
-        URL = "http://localhost:3000/getCubeMove?state=DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD";
+        var state = cube.state;
+        var URL = ip + api + "?state=" + state;
+        // URL = "http://localhost:3000/getCubeMove?state=DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD";
         axios.get(ip + api, {
             params: {
-                state: "DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD"
+                state: state
             }
         })
             .then(function (value) {

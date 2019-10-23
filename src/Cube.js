@@ -96,7 +96,7 @@ function Cube(id, opts) {
     //初始化容器大小和小块位置
     this.initStyle();
     //初始化各面颜色
-    this.initColors = this.opts.colors || [['yellow'], ['#fff'], ['blue'], ['green'], ['red'], ['orange']];
+    this.initColors = this.opts.colors || [['yellow'], ['green'], ['red'], ['#fff'], ['blue'], ['orange']];
     //this.initColors=this.opts.colors||[['none'],['none'],['none'],['none'],['none'],['none']];
     this.initColor();
 
@@ -218,6 +218,8 @@ Cube.prototype.setColor = function (colorarr) {
 
 //设定魔方颜色设定 格式DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD
 Cube.prototype.setColorChar = function (color) {
+    this.state = color;
+    console.log(color);
     var colorType = ['yellow', '#fff', 'blue', 'green', 'red', 'orange'];
     var arr = [];
 
@@ -591,7 +593,7 @@ Cube.prototype.turn = function (coor, num, dir, fnComplete) {
     } else {
         var dir = true
     }
-    ;//true代表正向
+    //true代表正向
     //累计步数
     this.foots++;
     //找到操作的元素
@@ -639,6 +641,7 @@ Cube.prototype.turn = function (coor, num, dir, fnComplete) {
         dom[i].dom.addEventListener('transitionend', transend, false);
         dom[i].dom.style.WebkitTransform = 'rotateZ(' + drz + 'deg) rotateY(' + dry + 'deg) rotateX(' + drx + 'deg)  translateZ(' + dom[i].translateZ + 'px) translate(' + dom[i].translateX + 'px,' + dom[i].translateY + 'px)';
     }
+    this.changeState(this.getTurnType(coor, num, dir));
 };
 
 //设置3阶魔方的简易操作 type  为 u,d,l,r,f,b,u',d',l',r',f',b'
@@ -693,7 +696,6 @@ Cube.prototype.turn3s = function (type, fnComplete) {
     if (length > 0) {
         dg();
     }
-    ;
 };
 
 Cube.prototype.getFoots = function () {
@@ -708,37 +710,46 @@ Cube.prototype.getRandom = function (a, b) {
 //随机打乱的方法，参数为随机打乱的步数。默认30
 Cube.prototype.random = function (n) {
     this.initColor();
+    this.state = "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB";
     var _this = this;
     var n = n || 30;
     var i = 0;
     var speed = this.oneTime;
     var order = this.order;
     var coors = ['x', 'y', 'z'];
+    var level = [0, 2];
     var linshi = parseInt(1000 / n);
-    this.oneTime = linshi < 50 ? 50 : linshi;
-    var value =
-        function turn_random() {
-            i++;
-            if (i > n) {
-                _this.oneTime = speed;
-            } else {
-                var coor = coors[_this.getRandom(0, 3)];
-                var num = _this.getRandom(0, order);
-                var dir = _this.getRandom(0, 2);
-                this.change(this.getTurnType(coor, num, dir))
-                _this.turn(coor, num, dir, function () {
-                    var timeout = setTimeout(function () {
-                        clearTimeout(timeout);
-                        turn_random();
-                    }, 0);
-                })
-            }
+    this.oneTime = 200;
+
+    function turn_random() {
+        i++;
+        if (i > n) {
+            _this.oneTime = speed;
+        } else {
+            var coor = coors[_this.getRandom(0, 3)];
+            var num = level[_this.getRandom(0, 2)];
+            var dir = _this.getRandom(0, 2);
+            console.log(i);
+            var type = _this.getTurnType(coor, num, dir);
+            _this.turn(coor, num, dir, function () {
+                var timeout = setTimeout(function () {
+                    clearTimeout(timeout);
+                    turn_random();
+                }, 0);
+            })
         }
+    }
 
     turn_random();
 };
 
-
+/**
+ * 判断魔方当前旋转方式
+ * @param coor
+ * @param num
+ * @param dir
+ * @returns {string}
+ */
 Cube.prototype.getTurnType = function (coor, num, dir) {
     switch (coor) {
         case "y":
@@ -752,46 +763,130 @@ Cube.prototype.getTurnType = function (coor, num, dir) {
             if (num == 0) {
                 return dir ? "l_" : "l";
             } else if (num == 2) {
-                return dir ? "r" : "r";
+                return dir ? "r" : "r_";
             }
             break;
         case "z":
-            if (num == 0) {
+            if (num == 2) {
                 return dir ? "f" : "f_";
-            } else if (num == 2) {
+            } else if (num == 0) {
                 return dir ? "b_" : "b";
             }
             break;
     }
 };
 
+
+/**
+ * 根据旋转状态，改变当前魔方状态
+ * @param turnType
+ */
 Cube.prototype.changeState = function (turnType) {
+    var temp = this.state;
+    var U = temp.substr(0, 9);
+    var R = temp.substr(9, 9);
+    var F = temp.substr(18, 9);
+    var D = temp.substr(27, 9);
+    var L = temp.substr(36, 9);
+    var B = temp.substr(45, 9);
     switch (turnType) {
         case "u":
+            var u = U[6] + U[3] + U[0] + U[7] + U[4] + U[1] + U[8] + U[5] + U[2];
+            var r = B.substr(0, 3) + R.substr(3, 6);
+            var f = R.substr(0, 3) + F.substr(3, 6);
+            var l = F.substr(0, 3) + L.substr(3, 6);
+            var b = L.substr(0, 3) + B.substr(3, 6);
+            this.state = u + r + f + D + l + b;
             break;
         case "u_":
+            var u = U[2] + U[5] + U[8] + U[1] + U[4] + U[7] + U[0] + U[3] + U[6];
+            var r = F.substr(0, 3) + R.substr(3, 6);
+            var f = L.substr(0, 3) + F.substr(3, 6);
+            var l = B.substr(0, 3) + L.substr(3, 6);
+            var b = R.substr(0, 3) + B.substr(3, 6);
+            this.state = u + r + f + D + l + b;
             break;
         case "d":
+            var d = D[6] + D[3] + D[0] + D[7] + D[4] + D[1] + D[8] + D[5] + D[2];
+            var r = R.substr(0, 6) + F.substr(6, 3);
+            var f = F.substr(0, 6) + L.substr(6, 3);
+            var l = L.substr(0, 6) + B.substr(6, 3);
+            var b = B.substr(0, 6) + R.substr(6, 3);
+            this.state = U + r + f + d + l + b;
             break;
         case "d_":
+            var d = D[2] + D[5] + D[8] + D[1] + D[4] + D[7] + D[0] + D[3] + D[6];
+            var r = R.substr(0, 6) + B.substr(6, 3);
+            var f = F.substr(0, 6) + R.substr(6, 3);
+            var l = L.substr(0, 6) + F.substr(6, 3);
+            var b = B.substr(0, 6) + L.substr(6, 3);
+            this.state = U + r + f + d + l + b;
             break;
         case "l":
+            var l = L[6] + L[3] + L[0] + L[7] + L[4] + L[1] + L[8] + L[5] + L[2];
+            var b = B[0] + B[1] + D[6] + B[3] + B[4] + D[3] + B[6] + B[7] + D[0];
+            var u = B[8] + U[1] + U[2] + B[5] + U[4] + U[5] + B[2] + U[7] + U[8];
+            var f = U[0] + F[1] + F[2] + U[3] + F[4] + F[5] + U[6] + F[7] + F[8];
+            var d = F[0] + D[1] + D[2] + F[3] + D[4] + D[5] + F[6] + D[7] + D[8];
+            this.state = u + R + f + d + l + b;
             break;
         case "l_":
+            var l = L[2] + L[5] + L[8] + L[1] + L[4] + L[7] + L[0] + L[3] + L[6];
+            var b = B[0] + B[1] + U[6] + B[3] + B[4] + U[3] + B[6] + B[7] + U[0];
+            var u = F[0] + U[1] + U[2] + F[3] + U[4] + U[5] + F[6] + U[7] + U[8];
+            var f = D[0] + F[1] + F[2] + D[3] + F[4] + F[5] + D[6] + F[7] + F[8];
+            var d = B[8] + D[1] + D[2] + B[5] + D[4] + D[5] + B[2] + D[7] + D[8];
+            this.state = u + R + f + d + l + b;
             break;
         case "r":
+            var r = R[6] + R[3] + R[0] + R[7] + R[4] + R[1] + R[8] + R[5] + R[2];
+            var b = U[8] + B[1] + B[2] + U[5] + B[4] + B[5] + U[2] + B[7] + B[8];
+            var u = U[0] + U[1] + F[2] + U[3] + U[4] + F[5] + U[6] + U[7] + F[8];
+            var f = F[0] + F[1] + D[2] + F[3] + F[4] + D[5] + F[6] + F[7] + D[8];
+            var d = D[0] + D[1] + B[6] + D[3] + D[4] + B[3] + D[6] + D[7] + B[0];
+            this.state = u + r + f + d + L + b;
             break;
         case "r_":
+            var r = R[2] + R[5] + R[8] + R[1] + R[4] + R[7] + R[0] + R[3] + R[6];
+            var b = D[8] + B[1] + B[2] + D[5] + B[4] + B[5] + D[2] + B[7] + B[8];
+            var u = U[0] + U[1] + B[6] + U[3] + U[4] + B[3] + U[6] + U[7] + B[0];
+            var f = F[0] + F[1] + U[2] + F[3] + F[4] + U[5] + F[6] + F[7] + U[8];
+            var d = D[0] + D[1] + F[2] + D[3] + D[4] + F[5] + D[6] + D[7] + F[8];
+            this.state = u + r + f + d + L + b;
             break;
         case "f":
+            var f = F[6] + F[3] + F[0] + F[7] + F[4] + F[1] + F[8] + F[5] + F[2];
+            var u = U.substr(0, 6) + L[8] + L[5] + L[2];
+            var r = U[6] + R[1] + R[2] + U[7] + R[4] + R[5] + U[8] + R[7] + R[8];
+            var d = R[6] + R[3] + R[0] + D.substr(3, 6);
+            var l = L[0] + L[1] + D[0] + L[3] + L[4] + D[1] + L[6] + L[7] + D[2];
+            this.state = u + r + f + d + l + B;
             break;
         case "f_":
+            var f = F[2] + F[5] + F[8] + F[1] + F[4] + F[7] + F[0] + F[3] + F[6];
+            var u = U.substr(0, 6) + R[0] + R[3] + R[6];
+            var r = D[2] + R[1] + R[2] + D[1] + R[4] + R[5] + D[0] + R[7] + R[8];
+            var d = L[2] + L[5] + L[8] + D.substr(3, 6);
+            var l = L[0] + L[1] + U[8] + L[3] + L[4] + U[7] + L[6] + L[7] + U[6];
+            this.state = u + r + f + d + l + B;
             break;
         case "b":
+            var b = B[6] + B[3] + B[0] + B[7] + B[4] + B[1] + B[8] + B[5] + B[2];
+            var u = R[2] + R[5] + R[8] + U.substr(3, 6);
+            var r = R[0] + R[1] + D[8] + R[3] + R[4] + D[7] + R[6] + R[7] + D[6];
+            var d = D.substr(0, 6) + L[0] + L[3] + L[6];
+            var l = U[2] + L[1] + L[2] + U[1] + L[4] + L[5] + U[0] + L[7] + L[8];
+            this.state = u + r + F + d + l + b;
             break;
         case "b_":
+            var b = B[2] + B[5] + B[8] + B[1] + B[4] + B[7] + B[0] + B[3] + B[6];
+            var u = L[6] + L[3] + L[0] + U.substr(3, 6);
+            var r = R[0] + R[1] + U[0] + R[3] + R[4] + U[1] + R[6] + R[7] + U[2];
+            var d = D.substr(0, 6) + R[8] + R[5] + R[2];
+            var l = D[6] + L[1] + L[2] + D[7] + L[4] + L[5] + D[8] + L[7] + L[8];
+            this.state = u + r + F + d + l + b;
             break;
     }
-
+    console.log(this.state)
 };
 
