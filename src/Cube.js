@@ -219,7 +219,6 @@ Cube.prototype.setColor = function (colorarr) {
 //设定魔方颜色设定 格式DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD
 Cube.prototype.setColorChar = function (color) {
     this.state = color;
-    console.log(color);
     var colorType = ['yellow', '#fff', 'blue', 'green', 'red', 'orange'];
     var arr = [];
 
@@ -698,6 +697,22 @@ Cube.prototype.turn3s = function (type, fnComplete) {
     }
 };
 
+Cube.prototype.recoveryTurn = function (move) {
+    var steps = move.toString().split(" ");
+    var turns = "";
+    for (var i = 0; i < steps.length; i++) {
+        var step = steps[i];
+        if (step[1] == "2") {
+            turns += (step[0] + step[0])
+        } else {
+            turns += step
+        }
+    }
+    turns = turns.toLowerCase();
+    this.turn3s(turns);
+    // this.state = "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB";
+};
+
 Cube.prototype.getFoots = function () {
     return this.foots;
 };
@@ -887,6 +902,5 @@ Cube.prototype.changeState = function (turnType) {
             this.state = u + r + F + d + l + b;
             break;
     }
-    console.log(this.state)
 };
 

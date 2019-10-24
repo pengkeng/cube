@@ -50,6 +50,7 @@
 
 <script type="text/javascript" src="Cube.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script type="text/javascript" src="//www.jb51.net/jslib/jquery/jquery.min.js"></script>
 <script type="text/javascript">
     var cube = new Cube('mf', {borderLength: 200});
 
@@ -78,19 +79,21 @@
         cube.setColorChar(value)
     };
 
-    cube.recovery = function () {
-        var ip = "http://124.16.124.95:3000";
-        var api = "/getCubeMove";
+    recovery = function () {
+        var ip = "http://39.105.171.199:8080";
+        var api = "/ucas-1.0-SNAPSHOT/hello";
         var state = cube.state;
-        var URL = ip + api + "?state=" + state;
-        // URL = "http://localhost:3000/getCubeMove?state=DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD";
+        var move;
+        // var URL = ip + api + "?state=" + state;
+        // URL = "http://39.105.171.199:8080/ucas-1.0-SNAPSHOT/hello?state=DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD";
         axios.get(ip + api, {
             params: {
                 state: state
             }
         })
             .then(function (value) {
-                console.log(value);
+                move = value.data.data.move;
+                cube.recoveryTurn(move);
             })
             .catch(function (reason) {
                 console.log(reason);
@@ -99,7 +102,7 @@
 
     };
     aInt2[7].onclick = function () {
-        cube.recovery(aInt2[5].value)
+        recovery(aInt2[5].value)
     };
 </script>
 
