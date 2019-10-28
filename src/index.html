@@ -16,7 +16,7 @@
         }
     </style>
 </head>
-<body style="background: #eeeeee;">
+<body style="background: #ffffff;">
 
 <div id="mf" style="margin:120px auto 80px;"></div>
 
@@ -46,10 +46,14 @@
     <input type="button" style="margin-top:10px" value="还原"/>
 
 </div>
+<a href="https://github.com/pengkeng/cube">
+    <img src="github.jpeg" style="position: absolute; right: 10px ;bottom: 10px ;width: 100px;height: 100px">
+</a>
 
 
 <script type="text/javascript" src="Cube.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script type="text/javascript" src="//www.jb51.net/jslib/jquery/jquery.min.js"></script>
 <script type="text/javascript">
     var cube = new Cube('mf', {borderLength: 200});
 
@@ -78,19 +82,21 @@
         cube.setColorChar(value)
     };
 
-    cube.recovery = function () {
-        var ip = "http://124.16.124.95:3000";
-        var api = "/getCubeMove";
-
-        var URL = ip + api + "?state=" + aInt2[5].value;
-        URL = "http://localhost:3000/getCubeMove?state=DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD";
+    recovery = function () {
+        var ip = "http://39.105.171.199:8080";
+        var api = "/ucas-1.0-SNAPSHOT/hello";
+        var state = cube.state;
+        var move;
+        // var URL = ip + api + "?state=" + state;
+        // URL = "http://39.105.171.199:8080/ucas-1.0-SNAPSHOT/hello?state=DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD";
         axios.get(ip + api, {
             params: {
-                state: "DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD"
+                state: state
             }
         })
             .then(function (value) {
-                console.log(value);
+                move = value.data.data.move;
+                cube.recoveryTurn(move);
             })
             .catch(function (reason) {
                 console.log(reason);
@@ -99,7 +105,7 @@
 
     };
     aInt2[7].onclick = function () {
-        cube.recovery(aInt2[5].value)
+        recovery(aInt2[5].value)
     };
 </script>
 
