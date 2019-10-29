@@ -380,7 +380,9 @@ Cube.prototype.containerMouseMove = function () {
 };
 //初始化魔方位子
 Cube.prototype.initL = function () {
-    this.rotateX = this.rotateY = this.rotateZ = 0;
+    this.rotateX = 0;
+    this.rotateY = 0;
+    this.rotateZ = 0;
     this.container.style.WebkitTransform = 'perspective(800px) rotateY(' + this.rotateY + 'deg) rotateX(' + this.rotateX + 'deg) rotateZ(' + this.rotateZ + 'deg)';
 };
 //设置容器拖拽时候的鼠标灵敏度
