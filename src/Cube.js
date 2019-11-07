@@ -57,6 +57,10 @@ setOneTime(time);//设置魔方扭动速度- 毫秒时间。
 
 //参数  id为魔方容器的id，opts为魔方的属性设置
 //opts  > borderLength:num 魔方边长, vColor:color魔方材料颜色 , colors:[[][][][][][]]魔方各个面的颜色  order:num 魔方阶乘 , mouseSen 拖拽时鼠标灵敏度 , oneTime 转动一下时需要的时间
+var colorType = ['yellow', 'black', 'blue', 'green', 'red', 'orange'];
+var colorTypePos = ['U', 'R', 'F', 'D', 'L', 'B'];
+var cubePos = '';
+
 function Cube(id, opts) {
     //储存Cube信息
     this.container = document.getElementById(id);//容器
@@ -96,7 +100,7 @@ function Cube(id, opts) {
     //初始化容器大小和小块位置
     this.initStyle();
     //初始化各面颜色
-    this.initColors = this.opts.colors || [['yellow'], ['green'], ['red'], ['#fff'], ['blue'], ['orange']];
+    this.initColors = this.opts.colors || [['yellow'], ['green'], ['red'], ['black'], ['blue'], ['orange']];
     //this.initColors=this.opts.colors||[['none'],['none'],['none'],['none'],['none'],['none']];
     this.initColor();
 
@@ -208,20 +212,38 @@ Cube.prototype.setColor = function (colorarr) {
     var b = this.order - 1;
     var filter = [{y: 0}, {y: b}, {x: 0}, {x: b}, {z: b}, {z: 0}];
     //添加颜色
+    // for (var i = 0; i < 6; i++) {
+    //     var dom = this.getDomByPos(filter[i]);
+    //     for (var j = 0; j < dom.length; j++) {
+    //         dom[j].faces[i].style.background = this.colors[i][j];
+    //     }
+    // }
     for (var i = 0; i < 6; i++) {
         var dom = this.getDomByPos(filter[i]);
         for (var j = 0; j < dom.length; j++) {
             dom[j].faces[i].style.background = this.colors[i][j];
+            dom[j].faces[i].setAttribute('pos', i + ',' + j);
+            dom[j].faces[i].onclick = function () {
+                console.log(this.getAttribute("pos"));
+                cubePos = this.getAttribute("pos");
+                $('#color-picker').css({
+                    'left': movex,
+                    'top': movey,
+                    'display': 'block'
+                });
+            }
         }
     }
 };
 
-//设定魔方颜色设定 格式DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD
-Cube.prototype.setColorChar = function (color) {
-    this.state = color;
-    var colorType = ['yellow', '#fff', 'blue', 'green', 'red', 'orange'];
-    var arr = [];
 
+/**
+ * 由于魔方绘制后的顺序和算法设定的颜色序列不一致，需要进行颜色序列的调整
+ * 算法颜色转为魔方颜色 输入时调用
+ * @param color
+ * @returns {*}
+ */
+Cube.prototype.translateColor = function (color) {
     var right = color.substr(9, 9);
     var coorright = right[2] + right[5] + right[8] + right[1] + right[4] + right[7] + right[0] + right[3] + right[6];
     var temp = color.substr(0, 9) + coorright + color.substr(18, 36);
@@ -244,30 +266,51 @@ Cube.prototype.setColorChar = function (color) {
 
     temp = color.substr(0, 9) + color.substr(27, 18) + color.substr(9, 18) + color.substr(45, 9);
     color = temp;
+    return color;
+};
+
+/**
+ * 由于魔方绘制后的顺序和算法设定的颜色序列不一致，需要进行颜色序列的调整
+ * 将魔方颜色转为算法颜色 输出时调用
+ * @param color
+ * @returns {*}
+ */
+Cube.prototype.translateCubeColor = function (color) {
+    temp = color.substr(0, 9) + color.substr(27, 18) + color.substr(9, 18) + color.substr(45, 9);
+    color = temp;
+
+    var right = color.substr(9, 9);
+    var coorright = right[6] + right[3] + right[0] + right[7] + right[4] + right[1] + right[8] + right[5] + right[2];
+    var temp = color.substr(0, 9) + coorright + color.substr(18, 36);
+    color = temp;
+
+    var bottom = color.substr(27, 9);
+    var coorbottom = bottom[6] + bottom[7] + bottom[8] + bottom[3] + bottom[4] + bottom[5] + bottom[0] + bottom[1] + bottom[2];
+    temp = color.substr(0, 27) + coorbottom + color.substr(36, 18);
+    color = temp;
+
+    var left = color.substr(36, 9);
+    var coorleft = left[0] + left[3] + left[6] + left[1] + left[4] + left[7] + left[2] + left[5] + left[8];
+    temp = color.substr(0, 36) + coorleft + color.substr(45, 9);
+    color = temp;
+
+    var back = color.substr(45, 9);
+    var coorback = back[2] + back[1] + back[0] + back[5] + back[4] + back[3] + back[8] + back[7] + back[6];
+    temp = color.substr(0, 45) + coorback;
+    color = temp;
+    return color;
+};
+
+//设定魔方颜色设定 格式DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD
+Cube.prototype.setColorChar = function (color) {
+    this.state = color;
+    var arr = [];
+    color = this.translateColor(color);
     for (var i = 0; i < 6; i++) {
         var sub = color.substr(i * 9, 9);
         var subArr = [];
         for (var j = 0; j < 9; j++) {
-            switch (sub[j]) {
-                case "U"://yellow
-                    subArr.push(colorType[0]);
-                    break;
-                case "R"://white
-                    subArr.push(colorType[1]);
-                    break;
-                case "F"://blue
-                    subArr.push(colorType[2]);
-                    break;
-                case "D"://green
-                    subArr.push(colorType[3]);
-                    break;
-                case "L"://red
-                    subArr.push(colorType[4]);
-                    break;
-                case "B"://orange
-                    subArr.push(colorType[5]);
-                    break;
-            }
+            subArr.push(colorType[colorTypePos.indexOf(sub[j])]);
         }
         arr.push(subArr);
     }
@@ -409,7 +452,7 @@ Cube.prototype.trunRightColorChange = function (arr, n) {
 };
 
 //某一面假定向上下反转 for reSetColorByTurnEnd方法
-Cube.prototype.trunTabX = function (arr) {
+Cube.prototype.turnTabX = function (arr) {
     if (!arr) return;
     var cacheArr = arr.slice(0);
     var order = this.order;
@@ -422,7 +465,7 @@ Cube.prototype.trunTabX = function (arr) {
     return cacheArr2;
 };
 
-Cube.prototype.trunTabY = function (arr) {
+Cube.prototype.turnTabY = function (arr) {
     if (!arr) return;
     var cacheArr = arr.slice(0);
     var order = this.order;
@@ -450,25 +493,15 @@ Cube.prototype.reSetColorByTurnEnd = function (coor, num, dir) {
     var color3 = this.colors[3].slice(0);
     var color4 = this.colors[4].slice(0);
     var color5 = this.colors[5].slice(0);
-//	console.log(color0);
-//	console.log(color1);
-//console.log(2)
-//	console.log(color2);
-//console.log(4)
-//	console.log(color4);
-//console.log(3)
-//	console.log(color3);
-//console.log(5)
-//	console.log(color5);
     switch (coor) {
         case 'x':
             if (dir) {
                 for (var i = 0; i < this.order; i++) {
                     var n = Number(num) + order * i;
                     this.colors[0][n] = color4[n];
-                    this.colors[4][n] = this.trunTabX(color1)[n];
+                    this.colors[4][n] = this.turnTabX(color1)[n];
                     this.colors[1][n] = color5[n];
-                    this.colors[5][n] = this.trunTabX(color0)[n];
+                    this.colors[5][n] = this.turnTabX(color0)[n];
                 }
                 //左转动
                 if (num == 0) {
@@ -481,9 +514,9 @@ Cube.prototype.reSetColorByTurnEnd = function (coor, num, dir) {
                 for (var i = 0; i < this.order; i++) {
                     var n = Number(num) + order * i;
                     this.colors[4][n] = color0[n];
-                    this.colors[1][n] = this.trunTabX(color4)[n];
+                    this.colors[1][n] = this.turnTabX(color4)[n];
                     this.colors[5][n] = color1[n];
-                    this.colors[0][n] = this.trunTabX(color5)[n];
+                    this.colors[0][n] = this.turnTabX(color5)[n];
                 }
                 //左转动
                 if (num == 0) {
@@ -499,9 +532,9 @@ Cube.prototype.reSetColorByTurnEnd = function (coor, num, dir) {
                 for (var i = 0; i < this.order; i++) {
                     var m = Number(num) + order * i;
                     var n = Number(num) * order + i;
-                    this.colors[4][n] = this.trunTabY(this.trunRightColorChange(color2, 3))[n];
+                    this.colors[4][n] = this.turnTabY(this.trunRightColorChange(color2, 3))[n];
                     this.colors[3][m] = this.trunRightColorChange(color4, 1)[m];
-                    this.colors[5][n] = this.trunRightColorChange(this.trunTabY(color3), 1)[n];
+                    this.colors[5][n] = this.trunRightColorChange(this.turnTabY(color3), 1)[n];
                     this.colors[2][m] = this.trunRightColorChange(color5, 1)[m];
                 }
                 //上转动
@@ -516,9 +549,9 @@ Cube.prototype.reSetColorByTurnEnd = function (coor, num, dir) {
                 for (var i = 0; i < this.order; i++) {
                     var n = Number(num) + order * i;
                     var m = Number(num) * order + i;
-                    this.colors[2][n] = this.trunTabY(this.trunRightColorChange(color4, 3))[n];
+                    this.colors[2][n] = this.turnTabY(this.trunRightColorChange(color4, 3))[n];
                     this.colors[4][m] = this.trunRightColorChange(color3, 3)[m];
-                    this.colors[3][n] = this.trunRightColorChange(this.trunTabY(color5), 1)[n];
+                    this.colors[3][n] = this.trunRightColorChange(this.turnTabY(color5), 1)[n];
                     this.colors[5][m] = this.trunRightColorChange(color2, 3)[m];
                 }
                 //上转动
@@ -536,9 +569,9 @@ Cube.prototype.reSetColorByTurnEnd = function (coor, num, dir) {
                 for (var i = 0; i < this.order; i++) {
                     var m = Number(num) * order + i;
                     ;
-                    this.colors[0][m] = this.trunTabY(color2)[m];
+                    this.colors[0][m] = this.turnTabY(color2)[m];
                     this.colors[2][m] = color1[m];
-                    this.colors[1][m] = this.trunTabY(color3)[m];
+                    this.colors[1][m] = this.turnTabY(color3)[m];
                     this.colors[3][m] = color0[m];
                 }
                 //后转动
@@ -553,9 +586,9 @@ Cube.prototype.reSetColorByTurnEnd = function (coor, num, dir) {
                 for (var i = 0; i < this.order; i++) {
                     var m = Number(num) * order + i;
                     ;
-                    this.colors[2][m] = this.trunTabY(color0)[m];
+                    this.colors[2][m] = this.turnTabY(color0)[m];
                     this.colors[1][m] = color2[m];
-                    this.colors[3][m] = this.trunTabY(color1)[m];
+                    this.colors[3][m] = this.turnTabY(color1)[m];
                     this.colors[0][m] = color3[m];
                 }
                 //后转动
@@ -712,7 +745,6 @@ Cube.prototype.recoveryTurn = function (move) {
     }
     turns = turns.toLowerCase();
     this.turn3s(turns);
-    // this.state = "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB";
 };
 
 Cube.prototype.getFoots = function () {
@@ -904,5 +936,26 @@ Cube.prototype.changeState = function (turnType) {
             this.state = u + r + F + d + l + b;
             break;
     }
+};
+
+
+/**
+ * 识别魔方当前状态，更新state
+ * @returns {Array}
+ */
+Cube.prototype.getAndRefreshColor = function () {
+    var cubeStatus = "";
+    for (var i = 0; i < 6; i++) {
+        var surface = "";
+        for (var j = 0; j < 9; j++) {
+            var pos = "[pos='" + i + ',' + j + "']";
+            var color = $(pos)[0].style['background'];
+            surface = surface + (colorTypePos[colorType.indexOf(color)]);
+        }
+        cubeStatus = cubeStatus + surface;
+    }
+    var color = this.translateCubeColor(cubeStatus);
+    this.state = color;
+    return color;
 };
 

@@ -15,10 +15,34 @@
             padding: 0px;
         }
     </style>
+
+    <!-- adminLTE -->
+    <link rel="stylesheet" href="adminLTE/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="adminLTE/bower_components/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="adminLTE/bower_components/Ionicons/css/ionicons.min.css">
+    <link rel="stylesheet" href="adminLTE/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="adminLTE/dist/css/AdminLTE.css">
+    <link rel="stylesheet" href="adminLTE/dist/css/skins/_all-skins.min.css">
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+    <!---->
 </head>
-<body style="background: #ffffff;">
+<body style="background: #ffffff;" onmousemove="mouseMove(event)">
 
 <div id="mf" style="margin:120px auto 80px;"></div>
+
+<div class="btn-group" id='color-picker' style="position:absolute;background-color:cornsilk;display:none">
+    <ul class="fc-color-picker" id="color-chooser" style="margin:0 5px">
+        <li><a href="#"><i class="fa fa-square color" style="color:yellow"></i></a></li>
+        <li><a href="#"><i class="fa fa-square color" style="color:black"></i></a></li>
+        <li><a href="#"><i class="fa fa-square color" style="color:blue"></i></a></li>
+        <li><a href="#"><i class="fa fa-square color" style="color:green;"></i></a></li>
+        <li><a href="#"><i class="fa fa-square color" style="color:red"></i></a></li>
+        <li><a href="#"><i class="fa fa-square color" style="color:orange"></i></a></li>
+    </ul>
+</div>
 
 <div id="btns" class="btns" style="margin:50px auto 20px; width:300px;">
     <input type="button" value="u"/>
@@ -44,12 +68,20 @@
     <input type="text" style="margin-top:10px;" value="DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD">
     <input type="button" style="margin-top:10px" value="设置颜色"/>
     <input type="button" style="margin-top:10px" value="还原"/>
+    <input type="button" style="margin-top:10px" value="获取状态"/>
+
 
 </div>
-<a href="https://github.com/pengkeng/cube">
-    <img src="GitHub.png" style="position: absolute; right: 10px ;bottom: 10px ;width: 50px;height: 50px">
-</a>
 
+<div style="margin:50px auto;width:180px;">
+    <p style="float:left;margin: 0;font-size: 12px;line-height: 20px;color: #999;text-align: center">
+        Copyright @2019 ucas</p>
+    <p style="float:left ;margin: 0;height: 20px; width: 35px">
+        <a href="https://github.com/pengkeng/cube">
+            <img src="GitHub.png" style=" width: 35px;height: 20px;padding-left: 15px">
+        </a>
+    </p>
+</div>
 
 <script type="text/javascript" src="Cube.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
@@ -87,6 +119,7 @@
         var api = "/ucas/getSolve";
         var state = cube.state;
         var move;
+        var data;
         // var URL = ip + api + "?state=" + state;
         // URL = "http://39.105.171.199:8080/ucas-1.0-SNAPSHOT/hello?state=DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD";
         axios.get(ip + api, {
@@ -95,11 +128,16 @@
             }
         })
             .then(function (value) {
-                move = value.data.data.move;
-                cube.recoveryTurn(move);
+                data = value.data.data;
+                if (data != null && data.move != null && data.move !== "") {
+                    move = value.data.data.move;
+                    cube.recoveryTurn(move);
+                } else {
+                    window.alert("魔方不可解");
+                }
             })
             .catch(function (reason) {
-                console.log(reason);
+                window.alert(reason);
             });
 
 
@@ -107,7 +145,38 @@
     aInt2[7].onclick = function () {
         recovery(aInt2[5].value)
     };
+    aInt2[8].onclick = function () {
+        console.log(cube.state);
+        var state = cube.getAndRefreshColor();
+        console.log(state);
+    };
+    movex = 0;
+    movey = 0;
+
+    mouseMove = function (e) {
+        e = e || window.event;
+        if (e.pageX || e.pageY) {
+            movex = e.pageX;
+            movey = e.pageY
+        }
+    };
+
+    $(".color").bind("click", function () {
+        pos = "[pos='" + cubePos + "']";
+        $(pos)[0].style['background'] = this.style['color'];
+        $('#color-picker').css({
+            'left': movex,
+            'top': movey,
+            'display': 'none'
+        });
+
+    })
 </script>
 
+<script src="adminLTE/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="adminLTE/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="adminLTE/bower_components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+<script src="adminLTE/dist/js/adminlte.min.js"></script>
+<script src="adminLTE/bower_components/fastclick/lib/fastclick.js"></script>
 </body>
 </html>
