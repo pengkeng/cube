@@ -57,7 +57,7 @@ setOneTime(time);//设置魔方扭动速度- 毫秒时间。
 
 //参数  id为魔方容器的id，opts为魔方的属性设置
 //opts  > borderLength:num 魔方边长, vColor:color魔方材料颜色 , colors:[[][][][][][]]魔方各个面的颜色  order:num 魔方阶乘 , mouseSen 拖拽时鼠标灵敏度 , oneTime 转动一下时需要的时间
-var colorType = ['yellow', 'black', 'blue', 'green', 'red', 'orange'];
+var colorType = ['yellow', 'orange', 'green', 'black', 'red', 'blue'];
 var colorTypePos = ['U', 'R', 'F', 'D', 'L', 'B'];
 var cubePos = '';
 
@@ -100,7 +100,19 @@ function Cube(id, opts) {
     //初始化容器大小和小块位置
     this.initStyle();
     //初始化各面颜色
-    this.initColors = this.opts.colors || [['yellow'], ['green'], ['red'], ['black'], ['blue'], ['orange']];
+    var colors = [];
+    for (var k = 0; k < colorType.length; k++) {
+        var color = [];
+        color.push(colorType[k]);
+        colors.push(color);
+    }
+    var temp = colors[3];
+    colors[3] = colors[1];
+    colors[1] = temp;
+    temp = colors[4];
+    colors[4] = colors[2];
+    colors[2] = temp;
+    this.initColors = this.opts.colors || colors;
     //this.initColors=this.opts.colors||[['none'],['none'],['none'],['none'],['none'],['none']];
     this.initColor();
 
@@ -956,6 +968,7 @@ Cube.prototype.getAndRefreshColor = function () {
     }
     var color = this.translateCubeColor(cubeStatus);
     this.state = color;
+    this.setColorChar(color);
     return color;
 };
 

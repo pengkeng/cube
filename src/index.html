@@ -115,6 +115,7 @@
     };
 
     recovery = function () {
+        cube.getAndRefreshColor();
         var ip = "http://39.105.171.199:8080";
         var api = "/ucas/getSolve";
         var state = cube.state;
@@ -169,7 +170,6 @@
             'top': movey,
             'display': 'none'
         });
-
     })
 </script>
 
