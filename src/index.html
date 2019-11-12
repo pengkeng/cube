@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title></title>
+    <title>魔方</title>
     <style>
         input {
             font-size: 16px;
@@ -69,16 +69,14 @@
     <input type="button" style="margin-top:10px" value="设置颜色"/>
     <input type="button" style="margin-top:10px" value="还原"/>
     <input type="button" style="margin-top:10px" value="获取状态"/>
-
-
 </div>
 
-<div style="margin:50px auto;width:180px;">
-    <p style="float:left;margin: 0;font-size: 12px;line-height: 20px;color: #999;text-align: center">
-        Copyright @2019 ucas</p>
-    <p style="float:left ;margin: 0;height: 20px; width: 35px">
+<div style="margin:50px auto;width:300px;">
+    <p style="float:left;margin: 0;font-size: 12px;line-height: 15px;color: #999;text-align: center">
+        版权所有©中国科学院大学 | 京ICP备19050951号</p>
+    <p style="float:left ;height: 25px; width: 30px">
         <a href="https://github.com/pengkeng/cube">
-            <img src="GitHub.png" style=" width: 35px;height: 20px;padding-left: 15px">
+            <img src="GitHub.png" style=" width: 30px;height: 25px;padding-left: 15px;padding-bottom: 10px">
         </a>
     </p>
 </div>
@@ -115,6 +113,7 @@
     };
 
     recovery = function () {
+        cube.getAndRefreshColor();
         var ip = "http://39.105.171.199:8080";
         var api = "/ucas/getSolve";
         var state = cube.state;
@@ -169,7 +168,7 @@
             'top': movey,
             'display': 'none'
         });
-
+        cube.getAndRefreshColor();
     })
 </script>
 
