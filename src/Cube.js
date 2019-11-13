@@ -57,7 +57,7 @@ setOneTime(time);//设置魔方扭动速度- 毫秒时间。
 
 //参数  id为魔方容器的id，opts为魔方的属性设置
 //opts  > borderLength:num 魔方边长, vColor:color魔方材料颜色 , colors:[[][][][][][]]魔方各个面的颜色  order:num 魔方阶乘 , mouseSen 拖拽时鼠标灵敏度 , oneTime 转动一下时需要的时间
-var colorType = ['yellow', 'orange', 'green', 'black', 'red', 'blue'];
+var colorType = ['yellow', 'orange', 'green', 'white', 'red', 'blue'];
 var colorTypePos = ['U', 'R', 'F', 'D', 'L', 'B'];
 var cubePos = '';
 
@@ -151,6 +151,8 @@ Cube.prototype.initStyle = function () {
             this.boxsData[i].faces[j].style.boxSizing = 'border-box';//设置边线 属性
             this.boxsData[i].faces[j].style.background = this.vColor; //设置面的原始颜色 同材料颜色
             this.boxsData[i].faces[j].style.borderRadius = parseInt(this.boxBorderLength / 10) + 'px'; //设置面的圆角，默认每小块的1/10
+            this.boxsData[i].faces[j].classList.add("selecteColor");
+			this.boxsData[i].faces[j].id = i*6+j;
             //设置每个面的偏移量
             var tx = 0, ty = 0, tz = 0, rx = 0, ry = 0, rz = 0;
             switch (j) {
@@ -235,15 +237,15 @@ Cube.prototype.setColor = function (colorarr) {
         for (var j = 0; j < dom.length; j++) {
             dom[j].faces[i].style.background = this.colors[i][j];
             dom[j].faces[i].setAttribute('pos', i + ',' + j);
-            dom[j].faces[i].onclick = function () {
-                console.log(this.getAttribute("pos"));
-                cubePos = this.getAttribute("pos");
-                $('#color-picker').css({
-                    'left': movex,
-                    'top': movey,
-                    'display': 'block'
-                });
-            }
+            // dom[j].faces[i].onclick = function () {
+            //     //console.log(this.getAttribute("pos"));
+            //     cubePos = this.getAttribute("pos");
+            //     $('#color-picker').css({
+            //         'left': movex,
+            //         'top': movey,
+            //         'display': 'block'
+            //     });
+            // }
         }
     }
 };
