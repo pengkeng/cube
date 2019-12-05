@@ -14,6 +14,11 @@
             margin: 5px 0;
             padding: 0px;
         }
+        #solve_area {
+            text-align:center;
+            font-size: xx-large;
+            margin:50px 50px;
+        }
     </style>
 
     <!-- adminLTE -->
@@ -31,7 +36,8 @@
 </head>
 <body style="background: #ffffff;" onmousemove="mouseMove(event)">
 
-<div id="mf" style="margin:120px auto 80px;"></div>
+<div id="solve_area"> 解魔方步骤</div>
+<div id="mf" style="margin:20px auto 80px;"></div>
 
 <div class="btn-group" id='color-picker' style="position:absolute;background-color:cornsilk;display:none">
     <ul class="fc-color-picker" id="color-chooser" style="margin:0 5px">
@@ -80,6 +86,13 @@
         </a>
     </p>
 </div>
+
+
+<script src="adminLTE/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="adminLTE/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="adminLTE/bower_components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+<script src="adminLTE/dist/js/adminlte.min.js"></script>
+<script src="adminLTE/bower_components/fastclick/lib/fastclick.js"></script>
 
 <script type="text/javascript" src="Cube.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
@@ -130,6 +143,7 @@
                 data = value.data.data;
                 if (data != null && data.move != null && data.move !== "") {
                     move = value.data.data.move;
+                    document.getElementById('solve_area').innerHTML=move;
                     cube.recoveryTurn(move);
                 } else {
                     window.alert("魔方不可解");
@@ -172,10 +186,5 @@
     })
 </script>
 
-<script src="adminLTE/bower_components/jquery/dist/jquery.min.js"></script>
-<script src="adminLTE/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-<script src="adminLTE/bower_components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
-<script src="adminLTE/dist/js/adminlte.min.js"></script>
-<script src="adminLTE/bower_components/fastclick/lib/fastclick.js"></script>
 </body>
 </html>
