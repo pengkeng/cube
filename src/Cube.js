@@ -72,7 +72,7 @@ function Cube(id, opts) {
     this.vColor = this.opts.vColor || '#999';//设定魔方材料颜色，默认是白色
     this.mouseSen = this.opts.mouseSen || 0.5;//默认鼠标灵敏度是1
     this.oneTime = this.opts.oneTime || 500;//转动一次的时间 毫秒
-    this.oneTimeBatch = this.opts.oneTimeBatch || 200;//批量扭动时扭动一次的时长
+    this.oneTimeBatch = this.opts.oneTimeBatch || 500;//批量扭动时扭动一次的时长
     //置空容器
     this.container.innerHTML = '';
 
@@ -719,6 +719,12 @@ Cube.prototype.turn3s = function (type, fnComplete) {
     var type = type.replace(' ', '');
     var arr = type.match(/\w\'?/g);
     var length = arr.length;
+
+    this.turns_arr = arr;
+    this.turns_arr_length = length;
+    console.log(this.turns_arr);
+    console.log(this.turns_arr_length);
+
     var now = 0;
     var _this = this;
     var time = this.oneTime;
@@ -744,6 +750,7 @@ Cube.prototype.turn3s = function (type, fnComplete) {
     }
 };
 
+
 Cube.prototype.recoveryTurn = function (move) {
     var steps = move.toString().split(" ");
     var turns = "";
@@ -755,7 +762,9 @@ Cube.prototype.recoveryTurn = function (move) {
             turns += step
         }
     }
+    document.getElementById('solve_area').innerHTML=turns;
     turns = turns.toLowerCase();
+    this.turns_state_cnt = 0; //初始化单步操作的计数器为0
     this.turn3s(turns);
 };
 
@@ -972,3 +981,85 @@ Cube.prototype.getAndRefreshColor = function () {
     return color;
 };
 
+
+/**
+ * 单步操作操作魔方的函数
+ *  Author:王鹏
+ * @returns {Array}
+ */
+Cube.prototype.turn3s_danbucaozuo = function (type, fnComplete) {
+    var type = type;
+    var arr = type.match(/\w\'?/g);
+    var length = arr.length;
+
+    var now = 0;
+    var _this = this;
+    var time = this.oneTime;
+    this.oneTime = this.oneTimeBatch;
+
+    function dg() {
+        _this.turn3(arr[now], function () {
+            now++;
+            if (now < length) {
+                var timeout = setTimeout(function () {
+                    clearTimeout(timeout);
+                    dg();
+                }, 0);
+            } else {
+                _this.oneTime = time;
+                fnComplete && fnComplete();
+            }
+        });
+    }
+
+    if (length > 0) {
+        dg();
+    }
+};
+/**
+ * 调整魔方的复原进度
+ *  Author:王鹏
+ * @returns {Array}
+ */
+Cube.prototype.clearTurnsStateCnt = function () {
+    this.turns_state_cnt= 0;
+}
+/**
+ * 调整魔方的复原进度
+ *  Author:王鹏
+ * @returns {Array}
+ */
+Cube.prototype.nextState = function () {
+    if(this.turns_arr_length > this.turns_state_cnt)
+    {
+        console.log(this.turns_arr_length);
+        console.log(this.turns_arr[this.turns_state_cnt]);
+        this.turn3s_danbucaozuo(this.turns_arr[this.turns_state_cnt]);
+    }
+    
+    this.turns_state_cnt += 1;
+
+};
+
+/**
+ * 调整魔方的复原进度, 还未写完
+ *  Author:王鹏
+ * @returns {Array}
+ */
+Cube.prototype.lastState = function () {
+    var reg = RegExp(/\w\'+/g);
+    if(reg.test(this.turns_arr[this.turns_state_cnt - 1]))
+    {
+        var turns_arr_temp = this.turns_arr[this.turns_state_cnt - 1].match(/\w/g);
+        this.turn3s_danbucaozuo(turns_arr_temp[0]);
+        console.log(turns_arr_temp[0]);
+    }
+    else
+    {
+        var turns_arr_temp = this.turns_arr[this.turns_state_cnt - 1] + "'";
+        this.turn3s_danbucaozuo(turns_arr_temp);
+        console.log(turns_arr_temp);
+    }
+
+    this.turns_state_cnt -= 1;
+};

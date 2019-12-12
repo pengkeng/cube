@@ -69,12 +69,14 @@
     <input type="button" value="重置颜色" style="margin-top:10px;"/>
     <input type="button" value="重置位置" style="margin-top:10px;"/>
     <input type="button" value="随机打乱" style="margin-top:10px;"/>
-    <input type="text" style="margin-top:10px;" value="ddr'd'ffbdrrddr'ffd'ffu'bblluudrru">
-    <input type="button" style="margin-top:10px" value="批量操作"/>
+    <input type="text" style="margin-top:10px; DISPLAY:none" value="ddr'd'ffbdrrddr'ffd'ffu'bblluudrru">
+    <input type="button" style="margin-top:10px;  DISPLAY:none" value="批量操作"/>
     <input type="text" style="margin-top:10px;" value="DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD">
     <input type="button" style="margin-top:10px" value="设置颜色"/>
     <input type="button" style="margin-top:10px" value="还原"/>
-    <input type="button" style="margin-top:10px" value="获取状态"/>
+    <input type="button" style="margin-top:10px; DISPLAY:none" value="获取状态"/>
+    <input type="button" style="margin-top:10px;" value="<"/>
+    <input type="button" style="margin-top:10px;" value=">"/>
 </div>
 
 <div style="margin:50px auto;width:300px;">
@@ -123,6 +125,7 @@
     aInt2[6].onclick = function () {
         var value = aInt2[5].value;
         cube.setColorChar(value)
+        cube.clearTurnsStateCnt();
     };
 
     recovery = function () {
@@ -143,7 +146,6 @@
                 data = value.data.data;
                 if (data != null && data.move != null && data.move !== "") {
                     move = value.data.data.move;
-                    document.getElementById('solve_area').innerHTML=move;
                     cube.recoveryTurn(move);
                 } else {
                     window.alert("魔方不可解");
@@ -156,6 +158,9 @@
 
     };
     aInt2[7].onclick = function () {
+        var state = cube.getAndRefreshColor();
+        aInt2[5].value = state;
+
         recovery(aInt2[5].value)
     };
     aInt2[8].onclick = function () {
@@ -163,6 +168,15 @@
         var state = cube.getAndRefreshColor();
         console.log(state);
     };
+
+    aInt2[9].onclick = function () {
+        cube.lastState();
+    };
+    aInt2[10].onclick = function () {
+        cube.nextState();
+    };
+    
+
     movex = 0;
     movey = 0;
 
