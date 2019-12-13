@@ -720,6 +720,8 @@ Cube.prototype.turn3s = function (type, fnComplete) {
     var arr = type.match(/\w\'?/g);
     var length = arr.length;
 
+    this.turns_state_cnt = arr.length; //初始化单步操作的计数器为0
+
     this.turns_arr = arr;
     this.turns_arr_length = length;
     console.log(this.turns_arr);
@@ -764,7 +766,7 @@ Cube.prototype.recoveryTurn = function (move) {
     }
     document.getElementById('solve_area').innerHTML=turns;
     turns = turns.toLowerCase();
-    this.turns_state_cnt = 0; //初始化单步操作的计数器为0
+   
     this.turn3s(turns);
 };
 
@@ -1032,13 +1034,15 @@ Cube.prototype.clearTurnsStateCnt = function () {
 Cube.prototype.nextState = function () {
     if(this.turns_arr_length > this.turns_state_cnt)
     {
-        console.log(this.turns_arr_length);
+
+        //console.log(this.turns_arr_length);
         console.log(this.turns_arr[this.turns_state_cnt]);
         this.turn3s_danbucaozuo(this.turns_arr[this.turns_state_cnt]);
+        this.turns_state_cnt += 1;
     }
-    
-    this.turns_state_cnt += 1;
 
+    console.log(this.turns_state_cnt);
+    
 };
 
 /**
@@ -1048,18 +1052,26 @@ Cube.prototype.nextState = function () {
  */
 Cube.prototype.lastState = function () {
     var reg = RegExp(/\w\'+/g);
-    if(reg.test(this.turns_arr[this.turns_state_cnt - 1]))
+    if(this.turns_state_cnt > 0)
     {
-        var turns_arr_temp = this.turns_arr[this.turns_state_cnt - 1].match(/\w/g);
-        this.turn3s_danbucaozuo(turns_arr_temp[0]);
-        console.log(turns_arr_temp[0]);
-    }
-    else
-    {
-        var turns_arr_temp = this.turns_arr[this.turns_state_cnt - 1] + "'";
-        this.turn3s_danbucaozuo(turns_arr_temp);
-        console.log(turns_arr_temp);
+        this.turns_state_cnt -= 1;
+
+        if(reg.test(this.turns_arr[this.turns_state_cnt]))
+        {
+            var turns_arr_temp = this.turns_arr[this.turns_state_cnt].match(/\w/g);
+            this.turn3s_danbucaozuo(turns_arr_temp[0]);
+            console.log(turns_arr_temp[0]);
+        }
+        else
+        {
+            var turns_arr_temp = this.turns_arr[this.turns_state_cnt] + "'";
+            this.turn3s_danbucaozuo(turns_arr_temp);
+            console.log(turns_arr_temp);
+        }
+        
+        
     }
 
-    this.turns_state_cnt -= 1;
+    console.log(this.turns_state_cnt);
+    
 };
