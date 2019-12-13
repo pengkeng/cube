@@ -16,30 +16,24 @@
         }
     </style>
 
-    <!-- jquery -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.ui.position.js"></script>
-    <!-- adminLTE
+    <!-- adminLTE -->
     <link rel="stylesheet" href="adminLTE/bower_components/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="adminLTE/bower_components/font-awesome/css/font-awesome.min.css">
     <link rel="stylesheet" href="adminLTE/bower_components/Ionicons/css/ionicons.min.css">
     <link rel="stylesheet" href="adminLTE/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
     <link rel="stylesheet" href="adminLTE/dist/css/AdminLTE.css">
-    <link rel="stylesheet" href="adminLTE/dist/css/skins/_all-skins.min.css"> -->
+    <link rel="stylesheet" href="adminLTE/dist/css/skins/_all-skins.min.css">
     <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <link rel="stylesheet"
           href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
     <!---->
 </head>
-<!-- <body style="background: #ffffff;" onmousemove="mouseMove(event)"> -->
-<body style="background: #ffffff;">
+<body style="background: #ffffff;" onmousemove="mouseMove(event)">
 
 <div id="mf" style="margin:120px auto 80px;"></div>
 
-<!-- <div class="btn-group" id='color-picker' style="position:absolute;background-color:cornsilk;display:none">
+<div class="btn-group" id='color-picker' style="position:absolute;background-color:cornsilk;display:none">
     <ul class="fc-color-picker" id="color-chooser" style="margin:0 5px">
         <li><a href="#"><i class="fa fa-square color" style="color:yellow"></i></a></li>
         <li><a href="#"><i class="fa fa-square color" style="color:black"></i></a></li>
@@ -48,7 +42,7 @@
         <li><a href="#"><i class="fa fa-square color" style="color:red"></i></a></li>
         <li><a href="#"><i class="fa fa-square color" style="color:orange"></i></a></li>
     </ul>
-</div> -->
+</div>
 
 <div id="btns" class="btns" style="margin:50px auto 20px; width:300px;">
     <input type="button" value="u"/>
@@ -66,7 +60,7 @@
 </div>
 
 <div class="cs" id="cs" style="width:300px; margin:0 auto;">
-    <input type="button" value="重置颜色" style="margin-top:10px;"/> 
+    <input type="button" value="重置颜色" style="margin-top:10px;"/>
     <input type="button" value="重置位置" style="margin-top:10px;"/>
     <input type="button" value="随机打乱" style="margin-top:10px;"/>
     <input type="text" style="margin-top:10px;" value="ddr'd'ffbdrrddr'ffd'ffu'bblluudrru">
@@ -89,7 +83,7 @@
 
 <script type="text/javascript" src="Cube.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-<!-- <script type="text/javascript" src="//www.jb51.net/jslib/jquery/jquery.min.js"></script> -->
+<script type="text/javascript" src="//www.jb51.net/jslib/jquery/jquery.min.js"></script>
 <script type="text/javascript">
     var cube = new Cube('mf', {borderLength: 200});
 
@@ -155,64 +149,33 @@
         var state = cube.getAndRefreshColor();
         console.log(state);
     };
+    movex = 0;
+    movey = 0;
 
-    // movex = 0;
-    // movey = 0;
+    mouseMove = function (e) {
+        e = e || window.event;
+        if (e.pageX || e.pageY) {
+            movex = e.pageX;
+            movey = e.pageY
+        }
+    };
 
-    // mouseMove = function (e) {
-    //     e = e || window.event;
-    //     if (e.pageX || e.pageY) {
-    //         movex = e.pageX;
-    //         movey = e.pageY
-    //     }
-    // };
-
-    // $(".color").bind("click", function () {
-    //     pos = "[pos='" + cubePos + "']";
-    //     $(pos)[0].style['background'] = this.style['color'];
-    //     $('#color-picker').css({
-    //         'left': movex,
-    //         'top': movey,
-    //         'display': 'none'
-    //     });
-    //     cube.getAndRefreshColor();
-    // })
-    $(document).ready(function() {
-        $.contextMenu({
-            // define which elements trigger this menu
-            selector: ".selecteColor",
-            callback: function(key, options) {
-                //var m = "clicked: " + options.$trigger.attr('id');
-                adiv_CubeFace = document.getElementById(options.$trigger.attr('id'));
-                
-                adiv_CubeFace.style.background = key;
-                
-                cube.getAndRefreshColor();
-                
-            },
-            // define the elements of the menu
-            items: {
-                blue: {name: "Blue",},
-                yellow: {name: "Yellow",},
-                white: {name: "White",},
-                green: {name: "Green",},
-                orange: {name: "Orange",},
-                red: {name: "Red",},
-            }
-            // there's more, have a look at the demos and docs...
+    $(".color").bind("click", function () {
+        pos = "[pos='" + cubePos + "']";
+        $(pos)[0].style['background'] = this.style['color'];
+        $('#color-picker').css({
+            'left': movex,
+            'top': movey,
+            'display': 'none'
         });
-
-        $('.selecteColor').on('contextmenu', function(e){
-            console.log(this.style.background);
-        })
-    
-    });
+        cube.getAndRefreshColor();
+    })
 </script>
 
-<!-- <script src="adminLTE/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="adminLTE/bower_components/jquery/dist/jquery.min.js"></script>
 <script src="adminLTE/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="adminLTE/bower_components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
 <script src="adminLTE/dist/js/adminlte.min.js"></script>
-<script src="adminLTE/bower_components/fastclick/lib/fastclick.js"></script> -->
+<script src="adminLTE/bower_components/fastclick/lib/fastclick.js"></script>
 </body>
 </html>
