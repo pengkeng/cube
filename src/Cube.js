@@ -764,6 +764,7 @@ Cube.prototype.recoveryTurn = function (move) {
             turns += step
         }
     }
+
     document.getElementById('solve_area').innerHTML=turns;
     turns = turns.toLowerCase();
    
@@ -1034,11 +1035,20 @@ Cube.prototype.clearTurnsStateCnt = function () {
 Cube.prototype.nextState = function () {
     if(this.turns_arr_length > this.turns_state_cnt)
     {
+        //增加状态高亮功能
+        if(this.turns_state_cnt < this.turns_arr_length-1)
+        {
+            var solve_letter = document.getElementById('solve_area').innerText.match(/\w\'?/g);
+            console.log(solve_letter);
+            solve_letter[this.turns_state_cnt+1] = "<font color=#FF6633>" + solve_letter[this.turns_state_cnt+1] + "</font>";
+            document.getElementById('solve_area').innerHTML = solve_letter;
+        }
 
         //console.log(this.turns_arr_length);
         console.log(this.turns_arr[this.turns_state_cnt]);
         this.turn3s_danbucaozuo(this.turns_arr[this.turns_state_cnt]);
         this.turns_state_cnt += 1;
+
     }
 
     console.log(this.turns_state_cnt);
@@ -1046,7 +1056,7 @@ Cube.prototype.nextState = function () {
 };
 
 /**
- * 调整魔方的复原进度, 还未写完
+ * 调整魔方的复原进度
  *  Author:王鹏
  * @returns {Array}
  */
@@ -1069,6 +1079,20 @@ Cube.prototype.lastState = function () {
             console.log(turns_arr_temp);
         }
         
+        if(this.turns_state_cnt>0)
+        {
+            var solve_letter = document.getElementById('solve_area').innerText.match(/\w\'?/g);
+            console.log(solve_letter);
+            solve_letter[this.turns_state_cnt-1] = "<font color=#FF6633>" + solve_letter[this.turns_state_cnt-1] + "</font>";
+            document.getElementById('solve_area').innerHTML = solve_letter;
+        }
+        else if(this.turns_state_cnt === 0)
+        {
+            var solve_letter = document.getElementById('solve_area').innerText.match(/\w\'?/g);
+            console.log(solve_letter);
+            solve_letter[0] = "<font color=#FF6633>" + solve_letter[0] + "</font>";
+            document.getElementById('solve_area').innerHTML = solve_letter;
+        }
         
     }
 
