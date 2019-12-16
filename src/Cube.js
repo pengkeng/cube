@@ -716,6 +716,8 @@ Cube.prototype.turn3 = function (type, fnComplete) {
 
     var obj = json[type.replace('\'', '_')];
     obj && this.turn(obj.coor, obj.num, obj.dir, fnComplete);
+
+  
 };
 
 //设置三阶魔方的批量操作 type 例如 uu'rr'bb'
@@ -1062,7 +1064,9 @@ Cube.prototype.lightLetter = function (index) {
  * @returns {Array}
  */
 Cube.prototype.nextState = function () {
-    if (this.recovery_arr.length > this.recovery_index) {
+    if(this.runing) return;
+    if (this.recovery_arr.length -1 > this.recovery_index) {
+
         this.turn3(this.recovery_arr[this.recovery_index + 1]);
         this.setLetterByTurnOver(true)
     }
@@ -1074,6 +1078,7 @@ Cube.prototype.nextState = function () {
  * @returns {Array}
  */
 Cube.prototype.lastState = function () {
+    if(this.runing) return;
     if (this.recovery_index >= 0) {
         var turn = this.recovery_arr[this.recovery_index];
         if (turn.length === 1) {
