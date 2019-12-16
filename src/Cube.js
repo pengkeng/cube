@@ -71,8 +71,8 @@ function Cube(id, opts) {
     this.borderLength = this.boxBorderLength * this.order;//重计算容器边长，避免小数点误差
     this.vColor = this.opts.vColor || '#999';//设定魔方材料颜色，默认是白色
     this.mouseSen = this.opts.mouseSen || 0.5;//默认鼠标灵敏度是1
-    this.oneTime = this.opts.oneTime || 500;//转动一次的时间 毫秒
-    this.oneTimeBatch = this.opts.oneTimeBatch || 500;//批量扭动时扭动一次的时长
+    this.oneTime = this.opts.oneTime || 200;//转动一次的时间 毫秒
+    this.oneTimeBatch = this.opts.oneTimeBatch || 200;//批量扭动时扭动一次的时长
     //置空容器
     this.container.innerHTML = '';
 
@@ -120,6 +120,10 @@ function Cube(id, opts) {
     this.containerMouseMove();
     this.state = "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB";
 
+    //还原序列，复原后可用
+    this.recovery_arr = [];
+    //当前复原的操作序号，0表示还未复原，其余表示复原了几步。
+    this.recovery_index = 0;
 }
 
 //设置初始样式
@@ -627,7 +631,7 @@ Cube.prototype.setOneTimeBatch = function (n) {
 
 
 //设置魔方操作  参数 轴XYZ 第几排 顺/逆时针 旋转完成后
-Cube.prototype.turn = function (coor, num, dir, fnComplete) {
+Cube.prototype.turn = function (coor, num, dir, fnComplete, type) {
     //阻止多次点击
     this.runing = this.runing || false;
     if (this.runing) return;
@@ -719,14 +723,6 @@ Cube.prototype.turn3s = function (type, fnComplete) {
     var type = type.replace(' ', '');
     var arr = type.match(/\w\'?/g);
     var length = arr.length;
-
-    this.turns_state_cnt = arr.length; //初始化单步操作的计数器为0
-
-    this.turns_arr = arr;
-    this.turns_arr_length = length;
-    console.log(this.turns_arr);
-    console.log(this.turns_arr_length);
-
     var now = 0;
     var _this = this;
     var time = this.oneTime;
@@ -759,15 +755,12 @@ Cube.prototype.recoveryTurn = function (move) {
     for (var i = 0; i < steps.length; i++) {
         var step = steps[i];
         if (step[1] == "2") {
-            turns += (step[0] + step[0])
+            turns += (step[0] + step[0]);
         } else {
-            turns += step
+            turns += step;
         }
     }
-
-    document.getElementById('solve_area').innerHTML=turns;
     turns = turns.toLowerCase();
-   
     this.turn3s(turns);
 };
 
@@ -985,74 +978,94 @@ Cube.prototype.getAndRefreshColor = function () {
 };
 
 
-/**
- * 单步操作操作魔方的函数
- *  Author:王鹏
- * @returns {Array}
- */
-Cube.prototype.turn3s_danbucaozuo = function (type, fnComplete) {
-    var type = type;
-    var arr = type.match(/\w\'?/g);
-    var length = arr.length;
+// /**
+//  * 单步操作操作魔方的函数
+//  *  Author:王鹏
+//  * @returns {Array}
+//  */
+// Cube.prototype.turn3 = function (type, fnComplete) {
+//     var type = type;
+//     var arr = type.match(/\w\'?/g);
+//     var length = arr.length;
+//
+//     var now = 0;
+//     var _this = this;
+//     var time = this.oneTime;
+//     this.oneTime = this.oneTimeBatch;
+//
+//     function dg() {
+//         _this.turn3(arr[now], function () {
+//             now++;
+//             if (now < length) {
+//                 var timeout = setTimeout(function () {
+//                     clearTimeout(timeout);
+//                     dg();
+//                 }, 0);
+//             } else {
+//                 _this.oneTime = time;
+//                 fnComplete && fnComplete();
+//             }
+//         });
+//     }
+//
+//     if (length > 0) {
+//         dg();
+//     }
+// };
 
-    var now = 0;
-    var _this = this;
-    var time = this.oneTime;
-    this.oneTime = this.oneTimeBatch;
-
-    function dg() {
-        _this.turn3(arr[now], function () {
-            now++;
-            if (now < length) {
-                var timeout = setTimeout(function () {
-                    clearTimeout(timeout);
-                    dg();
-                }, 0);
-            } else {
-                _this.oneTime = time;
-                fnComplete && fnComplete();
-            }
-        });
-    }
-
-    if (length > 0) {
-        dg();
-    }
-};
 /**
  * 调整魔方的复原进度
  *  Author:王鹏
  * @returns {Array}
  */
-Cube.prototype.clearTurnsStateCnt = function () {
-    this.turns_state_cnt= 0;
-}
+Cube.prototype.clearRecoveryState = function () {
+    this.recovery_arr = [];
+    this.recovery_index = 0;
+};
+
+/**
+ *
+ */
+Cube.prototype.setRecoveryState = function (move) {
+    var steps = move.toString().toLowerCase().split(" ");
+    var turns = [];
+    for (var i = 0; i < steps.length; i++) {
+        var step = steps[i];
+        if (step !== "")
+            if (step[1] === "2") {
+                turns.push(step[0]);
+                turns.push(step[0]);
+            } else {
+                turns.push(step);
+            }
+    }
+    this.recovery_arr = turns;
+
+    document.getElementById('solve_area').innerHTML = this.recovery_arr;
+    //初始化最后一个图标点亮
+    this.recovery_index = turns.length - 1;
+    this.lightLetter(this.recovery_index);
+
+};
+
+
+Cube.prototype.lightLetter = function (index) {
+    //增加状态高亮功能
+    var solve_letter = document.getElementById('solve_area').innerText.match(/\w\'?/g);
+    solve_letter[index] = "<font color=#FF6633>" + solve_letter[index] + "</font>";
+    document.getElementById('solve_area').innerHTML = solve_letter;
+};
+
 /**
  * 调整魔方的复原进度
  *  Author:王鹏
  * @returns {Array}
  */
 Cube.prototype.nextState = function () {
-    if(this.turns_arr_length > this.turns_state_cnt)
-    {
-        //增加状态高亮功能
-        if(this.turns_state_cnt < this.turns_arr_length-1)
-        {
-            var solve_letter = document.getElementById('solve_area').innerText.match(/\w\'?/g);
-            console.log(solve_letter);
-            solve_letter[this.turns_state_cnt+1] = "<font color=#FF6633>" + solve_letter[this.turns_state_cnt+1] + "</font>";
-            document.getElementById('solve_area').innerHTML = solve_letter;
-        }
-
-        //console.log(this.turns_arr_length);
-        console.log(this.turns_arr[this.turns_state_cnt]);
-        this.turn3s_danbucaozuo(this.turns_arr[this.turns_state_cnt]);
-        this.turns_state_cnt += 1;
-
+    if (this.recovery_arr.length > this.recovery_index) {
+        this.turn3(this.recovery_arr[this.recovery_index + 1]);
+        this.setLetterByTurnOver(true)
     }
-
-    console.log(this.turns_state_cnt);
-    
 };
 
 /**
@@ -1061,41 +1074,28 @@ Cube.prototype.nextState = function () {
  * @returns {Array}
  */
 Cube.prototype.lastState = function () {
-    var reg = RegExp(/\w\'+/g);
-    if(this.turns_state_cnt > 0)
-    {
-        this.turns_state_cnt -= 1;
-
-        if(reg.test(this.turns_arr[this.turns_state_cnt]))
-        {
-            var turns_arr_temp = this.turns_arr[this.turns_state_cnt].match(/\w/g);
-            this.turn3s_danbucaozuo(turns_arr_temp[0]);
-            console.log(turns_arr_temp[0]);
+    if (this.recovery_index >= 0) {
+        var turn = this.recovery_arr[this.recovery_index];
+        if (turn.length === 1) {
+            turn = turn + "'";
+        } else {
+            turn = turn[0];
         }
-        else
-        {
-            var turns_arr_temp = this.turns_arr[this.turns_state_cnt] + "'";
-            this.turn3s_danbucaozuo(turns_arr_temp);
-            console.log(turns_arr_temp);
-        }
-        
-        if(this.turns_state_cnt>0)
-        {
-            var solve_letter = document.getElementById('solve_area').innerText.match(/\w\'?/g);
-            console.log(solve_letter);
-            solve_letter[this.turns_state_cnt-1] = "<font color=#FF6633>" + solve_letter[this.turns_state_cnt-1] + "</font>";
-            document.getElementById('solve_area').innerHTML = solve_letter;
-        }
-        else if(this.turns_state_cnt === 0)
-        {
-            var solve_letter = document.getElementById('solve_area').innerText.match(/\w\'?/g);
-            console.log(solve_letter);
-            solve_letter[0] = "<font color=#FF6633>" + solve_letter[0] + "</font>";
-            document.getElementById('solve_area').innerHTML = solve_letter;
-        }
-        
+        this.turn3(turn);
+        this.setLetterByTurnOver(false)
     }
+};
 
-    console.log(this.turns_state_cnt);
-    
+Cube.prototype.setLetterByTurnOver = function (type) {
+    if (type) {
+        this.lightLetter(this.recovery_index + 1);
+        this.recovery_index += 1;
+    } else {
+        this.recovery_index -= 1;
+        if (this.recovery_index >= 0) {
+            this.lightLetter(this.recovery_index)
+        } else {
+            document.getElementById('solve_area').innerHTML = document.getElementById('solve_area').innerText.match(/\w\'?/g);
+        }
+    }
 };

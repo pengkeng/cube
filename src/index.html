@@ -14,10 +14,11 @@
             margin: 5px 0;
             padding: 0px;
         }
+
         #solve_area {
-            text-align:center;
+            text-align: center;
             font-size: xx-large;
-            margin:50px 50px;
+            margin: 50px 50px;
         }
     </style>
 
@@ -69,10 +70,11 @@
     <input type="button" value="重置颜色" style="margin-top:10px;"/>
     <input type="button" value="重置位置" style="margin-top:10px;"/>
     <input type="button" value="随机打乱" style="margin-top:10px;"/>
-    <input type="text" style="margin-top:10px; DISPLAY:none" value="ddr'd'ffbdrrddr'ffd'ffu'bblluudrru">
-    <input type="button" style="margin-top:10px;  DISPLAY:none" value="批量操作"/>
+    <input type="text" style="margin-top:10px" value="ddr'd'ffbdrrddr'ffd'ffu'bblluudrru">
+    <input type="button" style="margin-top:10px" value="批量操作"/>
     <input type="text" style="margin-top:10px;" value="DRLUUBFBRBLURRLRUBLRDDFDLFUFUFFDBRDUBRUFLLFDDBFLUBLRBD">
     <input type="button" style="margin-top:10px" value="设置颜色"/>
+    </br>
     <input type="button" style="margin-top:10px" value="还原"/>
     <input type="button" style="margin-top:10px; DISPLAY:none" value="获取状态"/>
     <input type="button" style="margin-top:10px;" value="<"/>
@@ -124,8 +126,8 @@
     };
     aInt2[6].onclick = function () {
         var value = aInt2[5].value;
-        cube.setColorChar(value)
-        cube.clearTurnsStateCnt();
+        cube.setColorChar(value);
+        cube.clearRecoveryState();
     };
 
     recovery = function () {
@@ -147,6 +149,7 @@
                 if (data != null && data.move != null && data.move !== "") {
                     move = value.data.data.move;
                     cube.recoveryTurn(move);
+                    cube.setRecoveryState(move);
                 } else {
                     window.alert("魔方不可解");
                 }
@@ -175,7 +178,7 @@
     aInt2[10].onclick = function () {
         cube.nextState();
     };
-    
+
 
     movex = 0;
     movey = 0;
