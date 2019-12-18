@@ -102,32 +102,56 @@
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script type="text/javascript" src="//www.jb51.net/jslib/jquery/jquery.min.js"></script>
 <script type="text/javascript">
+
+    eventClick = function (event, key, value) {
+        var ip = "http://39.105.171.199:8080";
+        var api = "/ucas/uploadClick";
+        axios.get(ip + api, {
+            params: {
+                event: event,
+                key: key,
+                value: value
+            }
+        })
+            .then(function (value) {
+            })
+            .catch(function (reason) {
+                window.alert(reason);
+            });
+
+    };
     var cube = new Cube('mf', {borderLength: 200});
 
     var aInt = document.getElementById('btns').getElementsByTagName('input');
     for (var i = 0; i < aInt.length; i++) {
         aInt[i].onclick = function () {
             cube.turn3(this.value);
+            eventClick("onClick", "turn", this.value);
         }
     }
     var aInt2 = document.getElementById('cs').getElementsByTagName('input');
     aInt2[0].onclick = function () {
         cube.initColor();
+        eventClick("onClick", "initColor", "true");
     };
     aInt2[1].onclick = function () {
         cube.initL();
+        eventClick("onClick", "initPosition", "true");
     };
     aInt2[2].onclick = function () {
         cube.random();
+        eventClick("onClick", "random", "true");
     };
     aInt2[4].onclick = function () {
         var value = aInt2[3].value;
         cube.turn3s(value);
+        eventClick("input", "turns", value);
     };
     aInt2[6].onclick = function () {
         var value = aInt2[5].value;
         cube.setColorChar(value);
         cube.clearRecoveryState();
+        eventClick("input", "setColor", value);
     };
 
     recovery = function () {
@@ -163,20 +187,23 @@
     aInt2[7].onclick = function () {
         var state = cube.getAndRefreshColor();
         aInt2[5].value = state;
-
         recovery(aInt2[5].value)
+        eventClick("onClick","recovery",state);
     };
     aInt2[8].onclick = function () {
         console.log(cube.state);
         var state = cube.getAndRefreshColor();
         console.log(state);
+        eventClick("onClick","debug",state);
     };
 
     aInt2[9].onclick = function () {
         cube.lastState();
+        eventClick("onClick","lastState","true");
     };
     aInt2[10].onclick = function () {
         cube.nextState();
+        eventClick("onClick","nextState","true");
     };
 
 
